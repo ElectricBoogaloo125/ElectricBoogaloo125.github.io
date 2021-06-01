@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>Outlook Room Finder</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-loading">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo">Admin Jack</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="../index.html">Home</a></li>
+							<li><a href="../posts.html">Posts</a></li>
+							<li><a href="../about.html">About me</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+								<span class="date">1st June 2021</span>
+									<h1>Updated Outlook Room Finder</h1>
+									<p>With everything going on in the world recently booking meeting rooms in the office was not something many of our staff had thought about. Now with staff slowly beginning to be allowed to go back to the office we needed to update our room booking approach. <br />
+									Turns out Microsoft has updated their Room finder since the last time I used it and it all looks that little bit better! Room Finder works within the Outlook application as well as Outlook in Office 365. 
+									</p>
+								</header>
+								<div class="image main"><img src="..\images\081017entmode\main01.jpg" alt="" /></div>
+								<p>If you already have Room lists setup then you will likely have already seen the new design and it all works. If not then you will need to setup Room lists to take advantage of the new Room Finder. I will go through the basic steps for setting up a Room list below as well as how to utilise the filter functionality using the Set-Place cmdlets in Powershell. I will be basing the following steps around an Exchange Online environment.</p>
+								<p>If you don't have any already you will need some Room accounts setup in Exchange Online. This is nice and easy to do and very documented. <a href="https://docs.microsoft.com/en-us/Exchange/recipients/room-mailboxes?view=exchserver-2019">Outlook Room Accounts</a></p>
+								<p>Once you have some rooms we can create some Room lists. Room lists are essentially a distriubtion list for your room acocunts. The rather annoying thing is they can only be managed by the Exchange Management Shell and not the Admin GUI.</p>
+								<p>Connect to your Exchange Management Shell and run the following command to create a Room List:</p>
+								<code>New-DistributionGroup -Name "London Office" -RoomList</code>
+								<p>Add your room accounts to the list by using the following command:</p>
+								<code>Add-DistributionGroupMember -Identity "London Office" -Member yourroom@yourdomain.com</code>
+								<p><span class="image right"><img src="..\images\081017entmode\pic01.jpg" alt="" /></span>Do this for all the rooms you want to add to the list. <br />
+								In theory this is all you need to do to add rooms to the Room Finder function. Login to Outlook, add a meeting and click the room finder button</p>
+								<p><span class="image left"><img src="..\images\081017entmode\pic01.jpg" alt="" /></span>In the building option search for your new Room List and you will see the available rooms within the list. </p>
+								<p>To enhance this further you can use the Set-Place cmdlets to allow for further filtering. Below is the command to add filtering options for Capacity, Audio and video capabilities. This is per room mailbox. </p>
+								<code>Set-Place -Identity yourroom@yourdomain.com -AudioDeviceName "Poly Collab Bar" -VideoDeviceName "Poly Collab Bar" -Capacity "2"</code>
+								<p>You can then filter on these attributes and you can see they have the added icons by the room name for quicker identification on what the room offers. </p>
+								<p>You maybe thinking this all seems like a lot of work if you have a lot of rooms to manage and update. Brian Reid has a good guide here for quickly updating all of your room accounts using a CSV file. Then you only have to worry about the Room lists!<a href="https://c7solutions.com/2019/08/making-your-office-365-meeting-rooms-accessible"> BRIAN RIED'S BLOG POST</a></p>
+								
+								
+								
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							
+						</section>
+						
+					</footer>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/skel.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
