@@ -1,0 +1,100 @@
+<!DOCTYPE HTML>
+<!--
+	Massively by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
+<html>
+	<head>
+		<title>About</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+		<link rel="stylesheet" href="../assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="../assets/css/noscript.css" /></noscript>
+	</head>
+	<body class="is-loading">
+
+		<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+					<header id="header">
+						<a href="../index.html" class="logo">Admin Jack</a>
+					</header>
+
+				<!-- Nav -->
+					<nav id="nav">
+						<ul class="links">
+							<li><a href="../index.html">Home</a></li>
+							<li><a href="../posts.html">Posts</a></li>
+							<li><a href="../about.html">About me</a></li>
+						</ul>
+						<ul class="icons">
+							<li><a href="#" class="icon fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon fa-instagram"><span class="label">Instagram</span></a></li>
+						</ul>
+					</nav>
+
+				<!-- Main -->
+					<div id="main">
+
+						<!-- Post -->
+							<section class="post">
+								<header class="major">
+								<span class="date">8th October 2017</span>
+									<h1>Enterprise Mode. Where have you been all my life?</h1>
+									<p>I may be the only person who hadn't heard of Enterpise mode.<br />
+									As part of our digital transformation project, our staff got Windows 10 and with it Microsoft Edge.<br />
+									We still needed to use Internet Explorer for older web applications but how do we ensure everyone is using the nice new secure browser over the soon to be legacy support one?
+									</p>
+								</header>
+								<div class="image main"><img src="..\images\081017entmode\main01.jpg" alt="" /></div>
+								<p>The premise of Enterprise mode is that you can control which websites open in Internet Explorer or Edge. Its a pretty simple adjustment but saved me all the aggro of having all intranet sites opening in Internet Explorer. Single sign on doesn't seem to like switching browsers mid way through the login!</p>
+								<p>My reasons for using Enterprise Mode is that we want all our staff to use Edge as their main broswer and only have Internet Explorer be used for web aplications that aren't supported in Edge yet.</p>
+								<p>First thing that needs to be done is to create an xml file. Easiest way is to use the "Enterpise Mode Site List Manager" found here: <a href="https://www.microsoft.com/en-us/download/details.aspx?id=49974"> SITE LIST MANAGER</a></p>
+								<p><span class="image right"><img src="..\images\081017entmode\pic01.jpg" alt="" /></span>Once installed you can specify the urls and how you want them to open. No need for a prefix, just need the domain name. reddit.com for example rather than http://reddit.com. You can then set what it opens with and the compatability mode you want to use.</p>
+								<p>In my case we are using Edge as the default browser so all urls in the list are the ones I want to open in Internet Explorer.</p>
+								<p>Once you have finished adding the urls you can click file and save the list to xml. I have popped this on a file share for now that all our staff have read access to. I plan to pop it on a web server at some point so its always accessible. </p>
+								<p>Now to set the group policies up.
+								<ul class="alt">
+												<li><code>Computer Configuration/Administritive Templates/Windows Components/Internet Explorer/Use the Enterprise Mode IE website list</code> - Enabled and enter path to xml file like so \\share\file.xml</li>
+												<li><code>Computer Configuration/Administritive Templates/Windows Components/Internet Explorer/Send all sites not included in the Enterprise Mode Site List to Microsoft Edge</code> - Enabled</li>
+												<li><code>Computer Configuration/Administritive Templates/Windows Components/Microsoft Edge/Configure the Enterprise Mode Site List</code> - Enabled and enter path to xml file like so \\share\file.xml</li>
+											</ul></p>
+								<p>And that is pretty much it. Run a GPUPDATE /FORCE and you browser should now auto switch between Edge and Internet Explorer for your specified sites. </p>
+								<p>There a few things to note:
+								<ul class="alt">
+												<li>Edge/IE polls every 60 seconds. When you first open a browser then it may take a moment to kick in. Same goes if you make changes to the xml.</li>
+												<li>You can add urls to the site list manager and export the xml. Each time it changes the version number. You can check the version number on a machine by checking this reg key: <code>HKEY_CURRENT_USER\SOFTWARE\Microsoft\Internet Explorer\Main\EnterpriseMode\CurrentVersion</code></li>
+											</ul></p>
+								
+								
+							</section>
+
+					</div>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<section>
+							
+						</section>
+						
+					</footer>
+
+				<!-- Copyright -->
+					<div id="copyright">
+						Design: <a href="https://html5up.net">HTML5 UP</a></li></ul>
+					</div>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="../assets/js/jquery.min.js"></script>
+			<script src="../assets/js/jquery.scrollex.min.js"></script>
+			<script src="../assets/js/jquery.scrolly.min.js"></script>
+			<script src="../assets/js/skel.min.js"></script>
+			<script src="../assets/js/util.js"></script>
+			<script src="../assets/js/main.js"></script>
+
+	</body>
+</html>
