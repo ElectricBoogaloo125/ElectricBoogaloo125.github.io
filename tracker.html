@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Budget Widget</title>
+    <style>
+        :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --primary: #0a84ff; --danger: #ff453a; --success: #32d74b; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica; background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; justify-content: center; }
+        .widget-container { width: 100%; max-width: 350px; background: var(--card); padding: 15px; border-radius: 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .remaining-val { font-size: 1.8em; font-weight: bold; color: var(--primary); }
+        .label { font-size: 0.75em; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+        .progress-bg { background: #333; height: 12px; border-radius: 6px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { background: var(--success); height: 100%; width: 100%; transition: width 0.5s ease; }
+        .input-row { display: grid; grid-template-columns: 1.5fr 1fr; gap: 8px; margin-top: 15px; }
+        input { background: #2c2c2e; border: 1px solid #3a3a3c; color: white; padding: 12px; border-radius: 10px; font-size: 16px; outline: none; }
+        button { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 10px; font-weight: bold; margin-top: 8px; width: 100%; font-size: 16px; -webkit-tap-highlight-color: transparent; }
+        .history-compact { margin-top: 15px; font-size: 0.85em; border-top: 1px solid #333; padding-top: 10px; max-height: 120px; overflow-y: auto; }
+        .history-row { display: flex; justify-content: space-between; padding: 4px 0; color: #bbb; }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <div class="header">
+            <div><div class="label">Remaining</div><div class="remaining-val" id="rem">£300.00</div></div>
+            <div style="text-align:right"><div class="label">Scenario B</div><div id="pct-text" style="font-size:0.9em">100%</div></div>
+        </div>
+        <div class="progress-bg"><div id="fill" class="progress-fill"></div></div>
+        <div class="input-row">
+            <input type="text" id="n" placeholder="Store">
+            <input type="number" id="a" placeholder="£">
+        </div>
+        <button onclick="log()">Quick Log</button>
+        <div class="history-compact" id="hist"></div>
+    </div>
+    <script>
+        let logs = JSON.parse(localStorage.getItem('b_logs')) || [];
+        const limit = 300.00;
+        function update() {
+            const spent = logs.reduce((s, i) => s + i.a, 0);
+            const left = limit - spent;
+            document.getElementById('rem').innerText = '£' + left.toFixed(2);
+            const p = Math.max(0, (left / limit) * 100);
+            document.getElementById('fill').style.width = p + '%';
+            document.getElementById('fill').style.background = p < 20 ? '#ff453a' : '#32d74b';
+            document.getElementById('pct-text').innerText = Math.round(p) + '%';
+            document.getElementById('hist').innerHTML = logs.slice(-3).reverse().map(l => `<div class="history-row"><span>${l.n}</span><b>-£${l.a.toFixed(2)}</b></div>`).join('');
+        }
+        function log() {
+            const n = document.getElementById('n').value, a = parseFloat(document.getElementById('a').value);
+            if(n && a) { logs.push({n, a}); localStorage.setItem('b_logs', JSON.stringify(logs)); }
+            document.getElementById('n').value = ''; document.getElementById('a').value = ''; update();
+        }
+        update();
+    </script>
+</body>
+</html>
