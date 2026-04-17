@@ -5,62 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Budget Widget</title>
     <style>
-        /* The Fix: box-sizing ensures padding doesn't push the box over the edge */
-        * { box-sizing: border-box; }
+        /* Force padding inside width for everything */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --primary: #0a84ff; --danger: #ff453a; --success: #32d74b; }
         
-        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 5px; display: flex; justify-content: center; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; justify-content: center; overflow: hidden; }
         
-        .widget-container { width: 100%; max-width: 320px; background: var(--card); padding: 12px; border-radius: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.5); border: 1px solid #333; }
+        .widget-container { width: 100%; max-width: 340px; background: var(--card); padding: 15px; border-radius: 18px; border: 1px solid #333; }
         
-        .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
-        .remaining-val { font-size: 1.5em; font-weight: bold; color: var(--primary); }
-        .label { font-size: 0.65em; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+        .remaining-val { font-size: 1.6em; font-weight: bold; color: var(--primary); }
+        .label { font-size: 0.7em; color: #888; text-transform: uppercase; }
 
-        .progress-bg { background: #333; height: 10px; border-radius: 5px; margin-bottom: 12px; overflow: hidden; }
+        .progress-bg { background: #333; height: 10px; border-radius: 5px; margin-bottom: 15px; overflow: hidden; }
         .progress-fill { background: var(--success); height: 100%; width: 100%; transition: width 0.4s ease; }
 
-        .input-row { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 6px; }
+        /* Use Flex to ensure items stay on one line without overflow */
+        .input-row { display: flex; gap: 8px; width: 100%; }
         
-        /* Fixed: Padding is now inside the width */
         input { 
             background: #2c2c2e; 
             border: 1px solid #3a3a3c; 
             color: white; 
-            padding: 10px; 
-            border-radius: 8px; 
-            font-size: 14px; 
-            width: 100%; 
+            padding: 12px; 
+            border-radius: 10px; 
+            font-size: 16px; 
             outline: none;
+            min-width: 0; /* Prevents flex items from bulging */
         }
+
+        #n { flex: 2; } /* Name box takes more space */
+        #a { flex: 1; } /* Amount box takes less */
+
+        /* Remove those annoying arrows in Brave/Chrome */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
         button { 
             background: var(--primary); 
             color: white; 
             border: none; 
-            padding: 10px; 
-            border-radius: 8px; 
+            padding: 14px; 
+            border-radius: 10px; 
             font-weight: bold; 
-            margin-top: 6px; 
+            margin-top: 10px; 
             width: 100%; 
-            font-size: 14px; 
+            font-size: 16px; 
         }
 
-        .history-compact { margin-top: 10px; font-size: 0.8em; border-top: 1px solid #333; padding-top: 8px; }
-        .history-row { display: flex; justify-content: space-between; padding: 2px 0; color: #aaa; }
+        .history-compact { margin-top: 12px; font-size: 0.85em; border-top: 1px solid #333; padding-top: 10px; }
+        .history-row { display: flex; justify-content: space-between; padding: 4px 0; color: #aaa; }
     </style>
 </head>
 <body>
     <div class="widget-container">
         <div class="header">
             <div><div class="label">Left</div><div class="remaining-val" id="rem">£300.00</div></div>
-            <div id="pct-text" style="color:#888; font-size:0.8em">100%</div>
+            <div id="pct-text" style="color:#888;">100%</div>
         </div>
         <div class="progress-bg"><div id="fill" class="progress-fill"></div></div>
         <div class="input-row">
-            <input type="text" id="n" placeholder="Store">
-            <input type="number" id="a" placeholder="£">
+            <input type="text" id="n" placeholder="Store" inputmode="text">
+            <input type="number" id="a" placeholder="£" inputmode="decimal">
         </div>
         <button onclick="log()">Log Spend</button>
         <div class="history-compact" id="hist"></div>
