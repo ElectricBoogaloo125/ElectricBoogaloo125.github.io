@@ -5,91 +5,98 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Budget Widget</title>
     <style>
-        /* Force padding inside width for everything */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
         :root { --bg: #121212; --card: #1e1e1e; --text: #ffffff; --primary: #0a84ff; --danger: #ff453a; --success: #32d74b; }
-        
         body { font-family: -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 10px; display: flex; justify-content: center; overflow: hidden; }
-        
-        .widget-container { width: 100%; max-width: 340px; background: var(--card); padding: 15px; border-radius: 18px; border: 1px solid #333; }
+        .widget-container { width: 100%; max-width: 340px; background: var(--card); padding: 15px; border-radius: 18px; border: 1px solid #333; position: relative; }
         
         .header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
         .remaining-val { font-size: 1.6em; font-weight: bold; color: var(--primary); }
         .label { font-size: 0.7em; color: #888; text-transform: uppercase; }
 
+        /* The dynamic bar requested */
         .progress-bg { background: #333; height: 10px; border-radius: 5px; margin-bottom: 15px; overflow: hidden; }
-        .progress-fill { background: var(--success); height: 100%; width: 100%; transition: width 0.4s ease; }
+        .progress-fill { background: var(--success); height: 100%; width: 100%; transition: width 0.4s ease, background-color 0.4s; }
 
-        /* Use Flex to ensure items stay on one line without overflow */
         .input-row { display: flex; gap: 8px; width: 100%; }
-        
-        input { 
-            background: #2c2c2e; 
-            border: 1px solid #3a3a3c; 
-            color: white; 
-            padding: 12px; 
-            border-radius: 10px; 
-            font-size: 16px; 
-            outline: none;
-            min-width: 0; /* Prevents flex items from bulging */
-        }
+        input { background: #2c2c2e; border: 1px solid #3a3a3c; color: white; padding: 12px; border-radius: 10px; font-size: 16px; outline: none; min-width: 0; }
+        #n { flex: 2; } 
+        #a { flex: 1; }
 
-        #n { flex: 2; } /* Name box takes more space */
-        #a { flex: 1; } /* Amount box takes less */
-
-        /* Remove those annoying arrows in Brave/Chrome */
         input::-webkit-outer-spin-button,
         input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
-        button { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            padding: 14px; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            margin-top: 10px; 
-            width: 100%; 
-            font-size: 16px; 
-        }
+        button.log-btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 10px; font-weight: bold; margin-top: 10px; width: 100%; font-size: 16px; }
+        
+        /* Small, discrete reset button */
+        .reset-btn { background: transparent; color: #444; border: none; font-size: 0.6em; position: absolute; bottom: 8px; right: 12px; padding: 5px; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
 
-        .history-compact { margin-top: 12px; font-size: 0.85em; border-top: 1px solid #333; padding-top: 10px; }
+        .history-compact { margin-top: 12px; font-size: 0.85em; border-top: 1px solid #333; padding-top: 10px; padding-bottom: 15px; }
         .history-row { display: flex; justify-content: space-between; padding: 4px 0; color: #aaa; }
     </style>
 </head>
 <body>
     <div class="widget-container">
         <div class="header">
-            <div><div class="label">Left</div><div class="remaining-val" id="rem">£300.00</div></div>
+            <div><div class="label">Remaining</div><div class="remaining-val" id="rem">£300.00</div></div>
             <div id="pct-text" style="color:#888;">100%</div>
         </div>
+        
         <div class="progress-bg"><div id="fill" class="progress-fill"></div></div>
+        
         <div class="input-row">
             <input type="text" id="n" placeholder="Store" inputmode="text">
             <input type="number" id="a" placeholder="£" inputmode="decimal">
         </div>
-        <button onclick="log()">Log Spend</button>
+        
+        <button class="log-btn" onclick="log()">Log Spend</button>
+        
         <div class="history-compact" id="hist"></div>
+        
+        <button class="reset-btn" onclick="resetData()">Reset Month</button>
     </div>
+
     <script>
         let logs = JSON.parse(localStorage.getItem('b_logs')) || [];
         const limit = 300.00;
+
         function update() {
             const spent = logs.reduce((s, i) => s + i.a, 0);
             const left = Math.max(0, limit - spent);
             document.getElementById('rem').innerText = '£' + left.toFixed(2);
+            
             const p = (left / limit) * 100;
-            document.getElementById('fill').style.width = p + '%';
-            document.getElementById('fill').style.background = p < 20 ? '#ff453a' : '#32d74b';
+            const barFill = document.getElementById('fill');
+            barFill.style.width = p + '%';
+            
+            // Logic to change color as you get closer to the limit
+            barFill.style.backgroundColor = p < 20 ? '#ff453a' : '#32d74b';
+            
             document.getElementById('pct-text').innerText = Math.round(p) + '%';
-            document.getElementById('hist').innerHTML = logs.slice(-2).reverse().map(l => `<div class="history-row"><span>${l.n}</span><b>-£${l.a.toFixed(2)}</b></div>`).join('');
+            document.getElementById('hist').innerHTML = logs.slice(-2).reverse().map(l => 
+                `<div class="history-row"><span>${l.n}</span><b>-£${l.a.toFixed(2)}</b></div>`
+            ).join('');
         }
+
         function log() {
             const n = document.getElementById('n').value, a = parseFloat(document.getElementById('a').value);
-            if(n && a) { logs.push({n, a}); localStorage.setItem('b_logs', JSON.stringify(logs)); }
-            document.getElementById('n').value = ''; document.getElementById('a').value = ''; update();
+            if(n && a) { 
+                logs.push({n, a}); 
+                localStorage.setItem('b_logs', JSON.stringify(logs)); 
+                document.getElementById('n').value = ''; 
+                document.getElementById('a').value = ''; 
+                update(); 
+            }
         }
+
+        function resetData() {
+            if(confirm("Confirm: New Month reset?")) {
+                logs = [];
+                localStorage.removeItem('b_logs');
+                update();
+            }
+        }
+
         update();
     </script>
 </body>
